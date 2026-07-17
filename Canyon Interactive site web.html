@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canyon Interactive — Studio de jeux vidéo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12141a;
+    --ink-soft:#1c1f28;
+    --dusk:#372a3d;
+    --rock-1:#4a2f38;
+    --rock-2:#6b3f37;
+    --rock-3:#8a5335;
+    --rock-4:#a8703f;
+    --sand:#e9e1d2;
+    --sand-dim:#b9b0a2;
+    --signal:#49d6c4;
+    --signal-dim:#2b7a70;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--ink);
+    color:var(--sand);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  ::selection{background:var(--signal); color:var(--ink);}
+
+  a{color:inherit;}
+
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    font-size:0.72rem;
+  }
+
+  :focus-visible{
+    outline:2px solid var(--signal);
+    outline-offset:3px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.4rem 2rem;
+    background:linear-gradient(to bottom, rgba(18,20,26,0.9), transparent);
+  }
+  .brand{
+    display:flex; flex-direction:column; line-height:1;
+  }
+  .brand-main{font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem; letter-spacing:0.02em;}
+  .brand-sub{font-family:'JetBrains Mono', monospace; font-size:0.6rem; letter-spacing:0.28em; color:var(--signal); margin-top:0.3rem;}
+
+  .nav-links{display:flex; gap:2.2rem; list-style:none;}
+  .nav-links a{
+    font-family:'JetBrains Mono', monospace; font-size:0.75rem;
+    text-transform:uppercase; letter-spacing:0.08em;
+    text-decoration:none; color:var(--sand-dim);
+    transition:color 0.2s;
+    position:relative;
+  }
+  .nav-links a:hover{color:var(--signal);}
+
+  .nav-toggle{display:none; background:none; border:none; color:var(--sand); font-size:1.4rem; cursor:pointer;}
+
+  @media (max-width:760px){
+    .nav-links{
+      position:fixed; top:0; right:0; height:100vh; width:min(280px, 80vw);
+      background:var(--ink-soft);
+      flex-direction:column; justify-content:center; align-items:flex-start;
+      gap:1.6rem; padding:2rem;
+      transform:translateX(100%);
+      transition:transform 0.35s ease;
+    }
+    .nav-links.open{transform:translateX(0);}
+    .nav-toggle{display:block;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    height:100vh; min-height:640px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    overflow:hidden;
+  }
+
+  .strata-bg{
+    position:absolute; inset:0; z-index:0;
+  }
+  .strata-bg .layer{
+    position:absolute; left:0; right:0; bottom:0;
+    border-radius:50% 50% 0 0 / 100px 100px 0 0;
+  }
+  .l1{height:32%; background:var(--rock-1); opacity:0.9;}
+  .l2{height:24%; background:var(--rock-2); opacity:0.85;}
+  .l3{height:16%; background:var(--rock-3); opacity:0.8;}
+  .l4{height:8%; background:var(--rock-4); opacity:0.75;}
+
+  .sky-glow{
+    position:absolute; top:-10%; left:50%; transform:translateX(-50%);
+    width:70vw; height:70vw; max-width:900px; max-height:900px;
+    background:radial-gradient(circle, rgba(73,214,196,0.15) 0%, rgba(73,214,196,0) 60%);
+    z-index:0; pointer-events:none;
+  }
+
+  .hero-content{position:relative; z-index:2; padding:0 1.5rem; max-width:720px;}
+
+  .eyebrow{color:var(--signal); margin-bottom:1.2rem; display:inline-block;}
+
+  .hero h1{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    line-height:1.05;
+    margin-bottom:1.4rem;
+  }
+  .hero h1 em{
+    font-style:italic; color:var(--signal);
+  }
+
+  .hero p{
+    color:var(--sand-dim);
+    font-size:1.05rem;
+    max-width:520px;
+    margin:0 auto 2.2rem;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:0.6rem;
+    background:transparent;
+    border:1px solid var(--signal);
+    color:var(--signal);
+    padding:0.85rem 1.6rem;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em;
+    text-decoration:none;
+    border-radius:2px;
+    transition:background 0.25s, color 0.25s;
+  }
+  .btn:hover{background:var(--signal); color:var(--ink);}
+
+  .scroll-cue{
+    position:absolute; bottom:2.2rem; left:50%; transform:translateX(-50%);
+    z-index:2;
+    width:1px; height:52px;
+    background:linear-gradient(to bottom, var(--signal), transparent);
+  }
+  .scroll-cue::after{
+    content:''; position:absolute; left:-3px; top:0;
+    width:7px; height:7px; border-radius:50%; background:var(--signal);
+    animation:cue-drop 2s infinite;
+  }
+  @keyframes cue-drop{
+    0%{top:0; opacity:1;}
+    90%{opacity:0.4;}
+    100%{top:44px; opacity:0;}
+  }
+
+  /* ---------- SIGNAL THREAD ---------- */
+  .thread-wrap{position:relative;}
+  .thread-line{
+    position:absolute; top:0; bottom:0; left:50%;
+    width:1px;
+    background:linear-gradient(to bottom, transparent, var(--signal-dim) 8%, var(--signal-dim) 92%, transparent);
+    z-index:0;
+  }
+  .thread-dot{
+    position:absolute; left:50%; width:9px; height:9px; margin-left:-4px;
+    border-radius:50%;
+    background:var(--signal);
+    box-shadow:0 0 16px 4px rgba(73,214,196,0.55);
+    z-index:1;
+  }
+
+  /* ---------- STRATA / GAMES SECTION ---------- */
+  section{position:relative; padding:6.5rem 2rem; z-index:1;}
+
+  .section-head{max-width:640px; margin:0 auto 3.5rem; text-align:center;}
+  .section-head .mono{color:var(--signal); display:block; margin-bottom:0.8rem;}
+  .section-head h2{font-size:clamp(1.8rem, 4vw, 2.6rem);}
+
+  .strata-list{max-width:920px; margin:0 auto; display:flex; flex-direction:column;}
+
+  .stratum{
+    position:relative;
+    display:grid; grid-template-columns:100px 1fr;
+    gap:2rem;
+    padding:2.6rem 1rem;
+    border-top:1px solid rgba(233,225,210,0.1);
+    opacity:0; transform:translateY(24px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .stratum.visible{opacity:1; transform:translateY(0);}
+  .stratum:last-child{border-bottom:1px solid rgba(233,225,210,0.1);}
+
+  .stratum-depth{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem; color:var(--sand-dim);
+    display:flex; flex-direction:column; gap:0.5rem;
+  }
+  .stratum-depth .swatch{width:22px; height:22px; border-radius:3px;}
+
+  .stratum h3{font-size:1.5rem; margin-bottom:0.6rem;}
+  .stratum p{color:var(--sand-dim); max-width:560px; margin-bottom:1rem;}
+  .tag-row{display:flex; gap:0.6rem; flex-wrap:wrap;}
+  .tag{
+    font-family:'JetBrains Mono', monospace; font-size:0.65rem;
+    text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--signal); border:1px solid var(--signal-dim);
+    padding:0.25rem 0.6rem; border-radius:2px;
+  }
+
+  @media (max-width:600px){
+    .stratum{grid-template-columns:1fr;}
+    .stratum-depth{flex-direction:row; align-items:center;}
+  }
+
+  /* ---------- CRAFT / VALUES ---------- */
+  .craft{background:var(--ink-soft);}
+  .craft-grid{
+    max-width:960px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:2.4rem;
+  }
+  .craft-item{
+    opacity:0; transform:translateY(20px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .craft-item.visible{opacity:1; transform:translateY(0);}
+  .craft-item .mono{color:var(--signal); margin-bottom:0.9rem; display:block;}
+  .craft-item h3{font-size:1.2rem; margin-bottom:0.6rem;}
+  .craft-item p{color:var(--sand-dim); font-size:0.95rem;}
+
+  @media (max-width:760px){
+    .craft-grid{grid-template-columns:1fr; gap:2.6rem;}
+  }
+
+  /* ---------- FOUNDER ---------- */
+  .founder-card{
+    max-width:640px; margin:0 auto;
+    display:flex; align-items:flex-start; gap:1.8rem;
+    background:var(--ink-soft);
+    border:1px solid rgba(233,225,210,0.1);
+    border-radius:4px;
+    padding:2rem;
+  }
+  .founder-avatar{
+    flex:none; width:64px; height:64px; border-radius:50%;
+    background:linear-gradient(135deg, var(--rock-4), var(--signal-dim));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size:1.5rem;
+    color:var(--ink);
+  }
+  .founder-role{color:var(--signal); display:block; margin:0.3rem 0 0.9rem;}
+
+  @media (max-width:520px){
+    .founder-card{flex-direction:column; align-items:center; text-align:center;}
+  }
+
+  /* ---------- CONTACT ---------- */
+  .contact{
+    text-align:center;
+    background:radial-gradient(circle at 50% 0%, rgba(73,214,196,0.08), transparent 60%);
+  }
+  .contact h2{font-size:clamp(1.8rem, 5vw, 3rem); max-width:640px; margin:0 auto 1.4rem;}
+  .contact p{color:var(--sand-dim); max-width:480px; margin:0 auto 2.2rem;}
+
+  footer{
+    padding:2.4rem 2rem; text-align:center;
+    color:var(--sand-dim); font-family:'JetBrains Mono', monospace; font-size:0.72rem;
+    border-top:1px solid rgba(233,225,210,0.08);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <span class="brand-main">CANYON</span>
+    <span class="brand-sub">INTERACTIVE</span>
+  </div>
+  <button class="nav-toggle" aria-label="Ouvrir le menu" id="navToggle">☰</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#games">Nos jeux</a></li>
+    <li><a href="#craft">Notre approche</a></li>
+    <li><a href="#join">Postuler</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <div class="sky-glow"></div>
+  <div class="strata-bg" aria-hidden="true">
+    <div class="layer l1"></div>
+    <div class="layer l2"></div>
+    <div class="layer l3"></div>
+    <div class="layer l4"></div>
+  </div>
+  <div class="hero-content">
+    <span class="mono eyebrow">Studio de jeux Roblox</span>
+    <h1>On creuse <em>jusqu'au bout</em>.</h1>
+    <p>Canyon Interactive est un studio Roblox déterminé à sortir des jeux qui tiennent la route — porté par des gens qui adorent ça et qui ne lâchent rien.</p>
+    <a href="#games" class="btn">Explorer nos jeux ↓</a>
+  </div>
+  <div class="scroll-cue"></div>
+</header>
+
+<div class="thread-wrap">
+  <div class="thread-line" id="threadLine"></div>
+  <div class="thread-dot" id="threadDot"></div>
+
+  <section id="games">
+    <div class="section-head">
+      <span class="mono">Strates 01–03</span>
+      <h2>Ce que nous construisons</h2>
+    </div>
+    <div class="strata-list">
+      <article class="stratum">
+        <div class="stratum-depth">
+          <div class="swatch" style="background:var(--rock-4)"></div>
+          Surface
+        </div>
+        <div>
+          <h3>Make Ice Cream</h3>
+          <p>Notre jeu Roblox — remplacez ce texte par le vrai pitch : le concept de gameplay, ce qu'on y fabrique, ce qui rend l'expérience amusante à rejouer.</p>
+          <div class="tag-row">
+            <span class="tag">Roblox</span>
+            <span class="tag">Disponible</span>
+          </div>
+        </div>
+      </article>
+      <article class="stratum">
+        <div class="stratum-depth">
+          <div class="swatch" style="background:var(--rock-3)"></div>
+          Milieu
+        </div>
+        <div>
+          <h3>Prototype en cours</h3>
+          <p>Décrivez ici l'expérience que vous testez actuellement : mécanique centrale, ambiance visée, ce qui la rend unique.</p>
+          <div class="tag-row">
+            <span class="tag">Prototype</span>
+          </div>
+        </div>
+      </article>
+      <article class="stratum">
+        <div class="stratum-depth">
+          <div class="swatch" style="background:var(--rock-2)"></div>
+          Origine
+        </div>
+        <div>
+          <h3>Le point de départ</h3>
+          <p>Racontez ici l'idée fondatrice du studio — le premier prototype, le déclic, ce qui a donné naissance à Canyon Interactive.</p>
+          <div class="tag-row">
+            <span class="tag">Fondation</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
+
+<section class="craft" id="craft">
+  <div class="section-head">
+    <span class="mono">Notre état d'esprit</span>
+    <h2>Déterminés à aller au bout</h2>
+  </div>
+  <div class="craft-grid">
+    <div class="craft-item">
+      <span class="mono">Détermination</span>
+      <h3>On ne lâche rien</h3>
+      <p>Un jeu Roblox qui marche, c'est des dizaines d'itérations — on s'accroche jusqu'à ce que ça soit bon, pas jusqu'à ce qu'on soit fatigués.</p>
+    </div>
+    <div class="craft-item">
+      <span class="mono">Passion</span>
+      <h3>Fait par des gens qui adorent ça</h3>
+      <p>Canyon Interactive existe parce qu'on aime les jeux vidéo, tout simplement — c'est ce qui nous fait tenir sur chaque projet.</p>
+    </div>
+    <div class="craft-item">
+      <span class="mono">Ambition</span>
+      <h3>On vise plus loin</h3>
+      <p>Make Ice Cream n'est qu'un début — le studio est construit pour grandir et sortir d'autres jeux.</p>
+    </div>
+  </div>
+</section>
+
+<section id="founder">
+  <div class="section-head">
+    <span class="mono">Le studio</span>
+    <h2>Fondé par un passionné de jeux vidéo</h2>
+  </div>
+  <div class="founder-card">
+    <div class="founder-avatar" aria-hidden="true">Z</div>
+    <div>
+      <h3>ZFRzeinox</h3>
+      <span class="mono founder-role">Fondateur &amp; Game Director</span>
+      <p>J'ai créé Canyon Interactive parce que j'adore les jeux vidéo — tout simplement. Aujourd'hui je dirige le studio et je supervise chaque jeu, de l'idée jusqu'à la sortie.</p>
+    </div>
+  </div>
+</section>
+
+<section id="join">
+  <div class="section-head">
+    <span class="mono">Rejoindre l'équipe</span>
+    <h2>Envie de bosser sur nos jeux ?</h2>
+    <p style="margin-top:1rem;">Canyon Interactive cherche régulièrement des gens motivés pour agrandir l'équipe — développeurs, builders, artistes 3D, tout profil passionné de Roblox est le bienvenu.</p>
+  </div>
+  <div style="text-align:center;">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScmyGXL-WvfcwyRi0zYOhNQCZjv182MWbijT8F8t1L7E8FENg/viewform?usp=dialog" target="_blank" rel="noopener" class="btn">Postuler</a>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <span class="mono eyebrow">Contact</span>
+  <h2>Une idée de jeu, une collaboration, une question ?</h2>
+  <p>Écrivez-nous — remplacez cette adresse par la vôtre.</p>
+  <a href="mailto:contact@canyoninteractive.studio" class="btn">contact@canyoninteractive.studio</a>
+</section>
+
+<footer>
+  © 2026 Canyon Interactive — Studio de jeux vidéo
+</footer>
+
+<script>
+  // Nav mobile toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.stratum, .craft-item');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.2 });
+  revealEls.forEach(el => io.observe(el));
+
+  // Signal thread dot follows scroll progress through the games section
+  const threadWrap = document.querySelector('.thread-wrap');
+  const threadDot = document.getElementById('threadDot');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function updateThread(){
+    if(reduceMotion) return;
+    const rect = threadWrap.getBoundingClientRect();
+    const total = rect.height;
+    const viewportCenter = window.innerHeight * 0.5;
+    let progress = (viewportCenter - rect.top) / total;
+    progress = Math.max(0, Math.min(1, progress));
+    threadDot.style.top = (progress * total) + 'px';
+  }
+  document.addEventListener('scroll', updateThread, { passive:true });
+  window.addEventListener('resize', updateThread);
+  updateThread();
+</script>
+
+</body>
+</html>
